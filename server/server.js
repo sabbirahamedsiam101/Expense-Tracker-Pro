@@ -11,7 +11,12 @@ connectDB();
 // expence-tracker-user
 // eRph43Ajgk0iS44k
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:8080",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.get("/", (req, res) => res.send("Server is running"));
 app.use("/api/incomes", incomeRouter);

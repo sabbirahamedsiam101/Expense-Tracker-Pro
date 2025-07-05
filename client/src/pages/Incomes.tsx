@@ -1,25 +1,27 @@
-
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import IncomeForm from '@/components/IncomeForm';
-import { incomeService } from '@/services/dataService';
-import { Income } from '@/types';
-import { Edit, Trash2, Plus } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import IncomeForm from "@/components/IncomeForm";
+import { Income } from "@/types";
+import { Edit, Trash2, Plus } from "lucide-react";
+import {
+  useGetIncomesQuery,
+  useAddIncomeMutation,
+} from "@/redux/features/incomes/incomesApi";
 
 const Incomes: React.FC = () => {
   const [incomes, setIncomes] = useState<Income[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIncome, setEditingIncome] = useState<Income | undefined>();
+  const { data, refetch } = useGetIncomesQuery(); // Fetch existing incomes from API
+  const [addIncome, { isLoading, isError }] = useAddIncomeMutation(); // Mutation for adding income
 
   useEffect(() => {
-    loadIncomes();
-  }, []);
-
-  const loadIncomes = () => {
-    const data = incomeService.getAll();
-    setIncomes(data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-  };
+    if (data) {
+      console.log("Incomes fetched:", data);
+      setIncomes(data); // Set fetched incomes data to state
+    }
+  }, [data]);
 
   const handleAdd = () => {
     setEditingIncome(undefined);
@@ -32,16 +34,27 @@ const Incomes: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this income?')) {
-      incomeService.delete(id);
-      loadIncomes();
+    if (window.confirm("Are you sure you want to delete this income?")) {
+      // incomeService.delete(id); // Assuming you have delete functionality in your service
+      refetch(); // Refetch after deleting
     }
   };
 
-  const handleFormSave = () => {
-    setShowForm(false);
-    setEditingIncome(undefined);
-    loadIncomes();
+  const handleFormSave = async (incomeData: Income) => {
+    // Ensure incomeData is not undefined and contains the necessary properties
+    if (!incomeData || !incomeData.title || !incomeData.amount || !incomeData.date) {
+      alert("All fields are required!");
+      return;
+    }
+
+    try {
+      await addIncome(incomeData).unwrap(); // Send income data to the backend via the API
+      setShowForm(false);
+      setEditingIncome(undefined);
+      refetch(); // Refresh the income list after saving
+    } catch (err) {
+      console.error("Error saving income:", err);
+    }
   };
 
   const handleFormCancel = () => {
@@ -54,18 +67,19 @@ const Incomes: React.FC = () => {
   };
 
   const formatAmount = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
     }).format(amount);
   };
 
+  // If form is open (for Add or Edit Income)
   if (showForm) {
     return (
       <div className="space-y-4 sm:space-y-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            {editingIncome ? 'Edit Income' : 'Add New Income'}
+            {editingIncome ? "Edit Income" : "Add New Income"}
           </h1>
         </div>
         <IncomeForm
@@ -77,11 +91,17 @@ const Incomes: React.FC = () => {
     );
   }
 
+  // If form is not open (show the income list)
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Income Management</h1>
-        <Button onClick={handleAdd} className="flex items-center justify-center space-x-2 w-full sm:w-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          Income Management
+        </h1>
+        <Button
+          onClick={handleAdd}
+          className="flex items-center justify-center space-x-2 w-full sm:w-auto"
+        >
           <Plus size={20} />
           <span>Add Income</span>
         </Button>
@@ -90,8 +110,12 @@ const Incomes: React.FC = () => {
       {incomes.length === 0 ? (
         <Card>
           <CardContent className="text-center py-8 sm:py-12 px-4">
-            <p className="text-gray-500 text-base sm:text-lg">No income records found.</p>
-            <p className="text-gray-400 mt-2 text-sm sm:text-base">Start by adding your first income entry.</p>
+            <p className="text-gray-500 text-base sm:text-lg">
+              No income records found.
+            </p>
+            <p className="text-gray-400 mt-2 text-sm sm:text-base">
+              Start by adding your first income entry.
+            </p>
             <Button onClick={handleAdd} className="mt-4 w-full sm:w-auto">
               Add Your First Income
             </Button>
@@ -105,7 +129,9 @@ const Incomes: React.FC = () => {
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 gap-2">
-                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">{income.title}</h3>
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
+                        {income.title}
+                      </h3>
                       <span className="text-xl sm:text-2xl font-bold text-green-600 self-start sm:self-auto">
                         {formatAmount(income.amount)}
                       </span>
@@ -144,7 +170,10 @@ const Incomes: React.FC = () => {
       {incomes.length > 0 && (
         <div className="text-center pt-4">
           <p className="text-gray-600 text-sm sm:text-base px-4">
-            Total Income Entries: {incomes.length} | Total Amount: {formatAmount(incomes.reduce((sum, income) => sum + income.amount, 0))}
+            Total Income Entries: {incomes.length} | Total Amount:{" "}
+            {formatAmount(
+              incomes.reduce((sum, income) => sum + income.amount, 0)
+            )}
           </p>
         </div>
       )}

@@ -1,11 +1,10 @@
-
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { incomeService } from '@/services/dataService';
-import { Income } from '@/types';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { incomeService } from "@/services/dataService";
+import { Income } from "@/types";
 
 interface IncomeFormProps {
   income?: Income;
@@ -13,12 +12,16 @@ interface IncomeFormProps {
   onCancel: () => void;
 }
 
-const IncomeForm: React.FC<IncomeFormProps> = ({ income, onSave, onCancel }) => {
+const IncomeForm: React.FC<IncomeFormProps> = ({
+  income,
+  onSave,
+  onCancel,
+}) => {
   const [formData, setFormData] = useState({
-    title: '',
-    amount: '',
-    date: '',
-    category: ''
+    title: income?.title || "",
+    amount: income?.amount || 0,
+    date: income?.date || "",
+    category: income?.category || "",
   });
 
   useEffect(() => {
@@ -27,19 +30,19 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ income, onSave, onCancel }) => 
         title: income.title,
         amount: income.amount.toString(),
         date: income.date,
-        category: income.category || ''
+        category: income.category || "",
       });
     }
   }, [income]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const incomeData = {
       title: formData.title,
       amount: parseFloat(formData.amount),
       date: formData.date,
-      category: formData.category || undefined
+      category: formData.category || undefined,
     };
 
     if (income) {
@@ -47,7 +50,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ income, onSave, onCancel }) => 
     } else {
       incomeService.create(incomeData);
     }
-    
+
     onSave();
   };
 
@@ -58,7 +61,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ income, onSave, onCancel }) => 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>{income ? 'Edit Income' : 'Add New Income'}</CardTitle>
+        <CardTitle>{income ? "Edit Income" : "Add New Income"}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -73,7 +76,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ income, onSave, onCancel }) => 
               required
             />
           </div>
-          
+
           <div>
             <Label htmlFor="amount">Amount</Label>
             <Input
@@ -87,7 +90,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ income, onSave, onCancel }) => 
               required
             />
           </div>
-          
+
           <div>
             <Label htmlFor="date">Date</Label>
             <Input
@@ -99,7 +102,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ income, onSave, onCancel }) => 
               required
             />
           </div>
-          
+
           <div>
             <Label htmlFor="category">Category (Optional)</Label>
             <Input
@@ -110,12 +113,17 @@ const IncomeForm: React.FC<IncomeFormProps> = ({ income, onSave, onCancel }) => 
               placeholder="e.g., Work, Business"
             />
           </div>
-          
+
           <div className="flex space-x-2 pt-4">
             <Button type="submit" className="flex-1">
-              {income ? 'Update' : 'Add'} Income
+              {income ? "Update" : "Add"} Income
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="flex-1"
+            >
               Cancel
             </Button>
           </div>
