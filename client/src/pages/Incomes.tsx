@@ -41,17 +41,13 @@ const Incomes: React.FC = () => {
   };
 
   const handleFormSave = async (incomeData: Income) => {
-    // Ensure incomeData is not undefined and contains the necessary properties
-    if (!incomeData || !incomeData.title || !incomeData.amount || !incomeData.date) {
-      alert("All fields are required!");
-      return;
-    }
+    console.log("Saving income:", incomeData);
 
     try {
-      await addIncome(incomeData).unwrap(); // Send income data to the backend via the API
+      await addIncome(incomeData).unwrap(); 
       setShowForm(false);
       setEditingIncome(undefined);
-      refetch(); // Refresh the income list after saving
+      refetch(); 
     } catch (err) {
       console.error("Error saving income:", err);
     }
@@ -124,7 +120,7 @@ const Incomes: React.FC = () => {
       ) : (
         <div className="grid gap-3 sm:gap-4">
           {incomes.map((income) => (
-            <Card key={income.id} className="hover:shadow-md transition-shadow">
+            <Card key={income._id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                   <div className="flex-1 min-w-0">

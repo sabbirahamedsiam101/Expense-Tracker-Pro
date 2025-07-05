@@ -8,7 +8,7 @@ import { Income } from "@/types";
 
 interface IncomeFormProps {
   income?: Income;
-  onSave: () => void;
+  onSave: (incomeData: Income) => void; // Change this to accept `incomeData` as an argument
   onCancel: () => void;
 }
 
@@ -19,16 +19,17 @@ const IncomeForm: React.FC<IncomeFormProps> = ({
 }) => {
   const [formData, setFormData] = useState({
     title: income?.title || "",
-    amount: income?.amount || 0,
+    amount: income?.amount.toString() || "", // Ensure amount is handled as a string
     date: income?.date || "",
     category: income?.category || "",
   });
 
+  // Update formData when `income` prop changes (for editing mode)
   useEffect(() => {
     if (income) {
       setFormData({
         title: income.title,
-        amount: income.amount.toString(),
+        amount: income.amount.toString(), // Ensure it's treated as string for input
         date: income.date,
         category: income.category || "",
       });
@@ -38,20 +39,24 @@ const IncomeForm: React.FC<IncomeFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const incomeData = {
-      title: formData.title,
-      amount: parseFloat(formData.amount),
-      date: formData.date,
-      category: formData.category || undefined,
-    };
-
-    if (income) {
-      incomeService.update(income.id, incomeData);
-    } else {
-      incomeService.create(incomeData);
+    // Validate the form data before sending it
+    if (!formData.title || !formData.amount || !formData.date) {
+      alert("All fields are required!");
+      return;
     }
 
-    onSave();
+    const incomeData = {
+      title: formData.title,
+      amount: parseFloat(formData.amount), // Ensure the amount is stored as a number
+      date: formData.date,
+      category: formData.category || undefined, // Category is optional
+    };
+
+    // Log incomeData for debugging
+    console.log("Saving income:", incomeData); // This should log the correct data
+
+    // Pass the incomeData to the parent component (Incomes.tsx)
+    onSave(incomeData); // Pass incomeData as an argument to onSave
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
