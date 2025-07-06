@@ -52,6 +52,47 @@ export const deleteIncome = async (req, res) => {
   }
 };
 
+// Get Monthly Data (Income, Expenses, Loans, Profit for the selected year)
+export const getMonthlyData = async (req, res) => {
+  const { year } = req.query;
+  try {
+    // Fetch monthly data for the given year
+    const monthlyData = await Income.aggregate([
+      {
+        $match: {
+          date: {
+            $gte: new Date(year, 0, 1), // Start of the year
+            $lt: new Date(year + 1, 0, 1), // End of the year
+          },
+        },
+      },
+      {
+        $group: {
+          _id: { $month: "$date" }, // Group by month
+          income: { $sum: "$amount" },
+          expenses: {
+            $sum: { $cond: [{ $eq: ["$category", "expense"] }, "$amount", 0] },
+          },
+          loans: {
+            $sum: { $cond: [{ $eq: ["$category", "loan"] }, "$amount", 0] },
+          },
+          profit: {
+            $sum: { $cond: [{ $eq: ["$category", "income"] }, "$amount", 0] },
+          }, // assuming profit calculation
+        },
+      },
+      {
+        $sort: { _id: 1 }, // Sort by month
+      },
+    ]);
+
+    // Return the monthly data
+    res.json(monthlyData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Get Monthly Summary
 export const getMonthlySummary = async (req, res) => {
   const { year, month } = req.query;

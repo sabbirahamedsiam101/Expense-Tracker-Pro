@@ -6,6 +6,7 @@ import {
   deleteIncome,
   getMonthlySummary,
   getAnnualSummary,
+  getMonthlyData,
 } from "../controllers/incomeController.js";
 
 const incomeRouter = Router();
@@ -16,7 +17,9 @@ incomeRouter.put("/:id", updateIncome);
 incomeRouter.delete("/:id", deleteIncome);
 
 // Routes for monthly and annual summary
-incomeRouter.get("/dashboard/monthly", getMonthlySummary);
-incomeRouter.get("/dashboard/annual", getAnnualSummary);
+incomeRouter.get("/monthly", getMonthlySummary);
+incomeRouter.get("/annual", getAnnualSummary);
+// Monthly Data Route (for monthly trends chart)
+incomeRouter.get("/monthly-data", getMonthlyData);
 
 export default incomeRouter;

@@ -7,6 +7,8 @@ import { Edit, Trash2, Plus } from "lucide-react";
 import {
   useGetIncomesQuery,
   useAddIncomeMutation,
+  useUpdateIncomeMutation,
+  useDeleteIncomeMutation, // Import the delete mutation hook
 } from "@/redux/features/incomes/incomesApi";
 
 const Incomes: React.FC = () => {
@@ -14,7 +16,12 @@ const Incomes: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingIncome, setEditingIncome] = useState<Income | undefined>();
   const { data, refetch } = useGetIncomesQuery(); // Fetch existing incomes from API
-  const [addIncome, { isLoading, isError }] = useAddIncomeMutation(); // Mutation for adding income
+  const [addIncome, { isLoading: isAdding, isError: isAddError }] =
+    useAddIncomeMutation(); // Mutation for adding income
+  const [updateIncome, { isLoading: isUpdating, isError: isUpdateError }] =
+    useUpdateIncomeMutation(); // Mutation for updating income
+  const [deleteIncome, { isLoading: isDeleting, isError: isDeleteError }] =
+    useDeleteIncomeMutation(); // Mutation for deleting income
 
   useEffect(() => {
     if (data) {
@@ -33,29 +40,31 @@ const Incomes: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleDelete = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this income?")) {
-      // incomeService.delete(id); // Assuming you have delete functionality in your service
-      refetch(); // Refetch after deleting
-    }
-  };
-
   const handleFormSave = async (incomeData: Income) => {
-    console.log("Saving income:", incomeData);
-
     try {
-      await addIncome(incomeData).unwrap(); 
-      setShowForm(false);
-      setEditingIncome(undefined);
-      refetch(); 
-    } catch (err) {
-      console.error("Error saving income:", err);
+      if (editingIncome) {
+        console.log("Updating income:", editingIncome._id, incomeData);
+        await updateIncome({ id: editingIncome._id, ...incomeData }).unwrap();
+      } else {
+        // If no income is being edited, call addIncome
+        await addIncome(incomeData).unwrap();
+      }
+      setShowForm(false); // Close form after saving
+    } catch (error) {
+      console.error("Error saving income:", error);
     }
   };
 
-  const handleFormCancel = () => {
-    setShowForm(false);
-    setEditingIncome(undefined);
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this income?")) {
+      try {
+        await deleteIncome(id).unwrap(); // Delete the income by ID
+        // Optionally, update the state locally to avoid refetching
+        setIncomes(incomes.filter((income) => income._id !== id));
+      } catch (error) {
+        console.error("Error deleting income:", error);
+      }
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -69,7 +78,6 @@ const Incomes: React.FC = () => {
     }).format(amount);
   };
 
-  // If form is open (for Add or Edit Income)
   if (showForm) {
     return (
       <div className="space-y-4 sm:space-y-6">
@@ -81,13 +89,12 @@ const Incomes: React.FC = () => {
         <IncomeForm
           income={editingIncome}
           onSave={handleFormSave}
-          onCancel={handleFormCancel}
+          onCancel={() => setShowForm(false)}
         />
       </div>
     );
   }
 
-  // If form is not open (show the income list)
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -120,7 +127,7 @@ const Incomes: React.FC = () => {
       ) : (
         <div className="grid gap-3 sm:gap-4">
           {incomes.map((income) => (
-            <Card key={income._id} className="hover:shadow-md transition-shadow">
+            <Card key={income.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                   <div className="flex-1 min-w-0">
@@ -150,7 +157,7 @@ const Incomes: React.FC = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDelete(income.id)}
+                      onClick={() => handleDelete(income._id)}
                       className="p-2 text-red-600 hover:text-red-700"
                     >
                       <Trash2 size={16} />

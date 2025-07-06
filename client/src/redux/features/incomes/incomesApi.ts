@@ -1,4 +1,3 @@
-// src/redux/features/incomes/incomesApi.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { getBaseURL } from "../../../utlis/baseURL";
 
@@ -43,12 +42,17 @@ export const incomesApi = createApi({
 
     // Annual summary endpoint
     getAnnualSummary: builder.query({
-      query: (year) => `/dashboard/annual?year=${year}`, // Endpoint for annual summary
+      query: (year) => `/annual?year=${year}`, // Endpoint for annual summary
     }),
 
     // Monthly summary endpoint
     getMonthlySummary: builder.query({
-      query: ({ year, month }) => `/dashboard/monthly?year=${year}&month=${month}`, // Endpoint for monthly summary
+      query: ({ year, month }) => `/monthly?year=${year}&month=${month}`, // Endpoint for monthly summary
+    }),
+
+    // Monthly data for BarChart (income, expenses, loans, profit)
+    getMonthlyData: builder.query({
+      query: (year) => `/monthly-data?year=${year}`, // New endpoint for monthly data
     }),
   }),
 });
@@ -58,8 +62,9 @@ export const {
   useAddIncomeMutation,
   useUpdateIncomeMutation,
   useDeleteIncomeMutation,
-  useGetAnnualSummaryQuery,  // Ensure this hook is exported
-  useGetMonthlySummaryQuery, // Ensure this hook is exported
+  useGetAnnualSummaryQuery,
+  useGetMonthlySummaryQuery,
+  useGetMonthlyDataQuery,  // Add the hook for monthly data
 } = incomesApi;
 
 export default incomesApi;
