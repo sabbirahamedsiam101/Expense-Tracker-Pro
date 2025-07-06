@@ -1,6 +1,6 @@
 
 export interface Income {
-  id: string;
+  _id: string;
   title: string;
   amount: number;
   date: string;
@@ -9,7 +9,7 @@ export interface Income {
 }
 
 export interface Expense {
-  id: string;
+  _id: string;
   title: string;
   amount: number;
   date: string;
@@ -18,7 +18,7 @@ export interface Expense {
 }
 
 export interface Loan {
-  id: string;
+  _id: string;
   employeeName: string;
   amount: number;
   reason: string;

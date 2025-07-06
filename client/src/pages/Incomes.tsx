@@ -15,13 +15,10 @@ const Incomes: React.FC = () => {
   const [incomes, setIncomes] = useState<Income[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIncome, setEditingIncome] = useState<Income | undefined>();
-  const { data, refetch } = useGetIncomesQuery(); // Fetch existing incomes from API
-  const [addIncome, { isLoading: isAdding, isError: isAddError }] =
-    useAddIncomeMutation(); // Mutation for adding income
-  const [updateIncome, { isLoading: isUpdating, isError: isUpdateError }] =
-    useUpdateIncomeMutation(); // Mutation for updating income
-  const [deleteIncome, { isLoading: isDeleting, isError: isDeleteError }] =
-    useDeleteIncomeMutation(); // Mutation for deleting income
+  const { data, refetch } = useGetIncomesQuery({});
+  const [addIncome, { isLoading: isAdding, isError: isAddError }] = useAddIncomeMutation();
+  const [updateIncome, { isLoading: isUpdating, isError: isUpdateError }] = useUpdateIncomeMutation();
+  const [deleteIncome, { isLoading: isDeleting, isError: isDeleteError }] = useDeleteIncomeMutation();
 
   useEffect(() => {
     if (data) {
@@ -43,7 +40,6 @@ const Incomes: React.FC = () => {
   const handleFormSave = async (incomeData: Income) => {
     try {
       if (editingIncome) {
-        console.log("Updating income:", editingIncome._id, incomeData);
         await updateIncome({ id: editingIncome._id, ...incomeData }).unwrap();
       } else {
         // If no income is being edited, call addIncome
@@ -127,7 +123,7 @@ const Incomes: React.FC = () => {
       ) : (
         <div className="grid gap-3 sm:gap-4">
           {incomes.map((income) => (
-            <Card key={income.id} className="hover:shadow-md transition-shadow">
+            <Card key={income._id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
                   <div className="flex-1 min-w-0">

@@ -1,24 +1,27 @@
-
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { expenseService } from '@/services/dataService';
-import { Expense } from '@/types';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { expenseService } from "@/services/dataService";
+import { Expense } from "@/types";
 
 interface ExpenseFormProps {
   expense?: Expense;
-  onSave: () => void;
+  onSave: (expenseData: Expense) => void;
   onCancel: () => void;
 }
 
-const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onSave, onCancel }) => {
+const ExpenseForm: React.FC<ExpenseFormProps> = ({
+  expense,
+  onSave,
+  onCancel,
+}) => {
   const [formData, setFormData] = useState({
-    title: '',
-    amount: '',
-    date: '',
-    category: ''
+    title: expense?.title || "",
+    amount: expense?.amount.toString() || "",
+    date: expense?.date || "",
+    category: expense?.category || "",
   });
 
   useEffect(() => {
@@ -27,28 +30,24 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onSave, onCancel }) 
         title: expense.title,
         amount: expense.amount.toString(),
         date: expense.date,
-        category: expense.category || ''
+        category: expense.category || "",
       });
     }
   }, [expense]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const expenseData = {
       title: formData.title,
       amount: parseFloat(formData.amount),
       date: formData.date,
-      category: formData.category || undefined
+      category: formData.category || undefined,
     };
 
-    if (expense) {
-      expenseService.update(expense.id, expenseData);
-    } else {
-      expenseService.create(expenseData);
-    }
-    
-    onSave();
+    console.log("Saving expense:", expenseData);
+
+    onSave(expenseData);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +57,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onSave, onCancel }) 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>{expense ? 'Edit Expense' : 'Add New Expense'}</CardTitle>
+        <CardTitle>{expense ? "Edit Expense" : "Add New Expense"}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -73,7 +72,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onSave, onCancel }) 
               required
             />
           </div>
-          
+
           <div>
             <Label htmlFor="amount">Amount</Label>
             <Input
@@ -87,7 +86,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onSave, onCancel }) 
               required
             />
           </div>
-          
+
           <div>
             <Label htmlFor="date">Date</Label>
             <Input
@@ -99,7 +98,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onSave, onCancel }) 
               required
             />
           </div>
-          
+
           <div>
             <Label htmlFor="category">Category (Optional)</Label>
             <Input
@@ -110,12 +109,17 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({ expense, onSave, onCancel }) 
               placeholder="e.g., Utilities, Supplies"
             />
           </div>
-          
+
           <div className="flex space-x-2 pt-4">
             <Button type="submit" className="flex-1">
-              {expense ? 'Update' : 'Add'} Expense
+              {expense ? "Update" : "Add"} Expense
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="flex-1"
+            >
               Cancel
             </Button>
           </div>
