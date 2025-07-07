@@ -1,6 +1,5 @@
 import { model, Schema } from "mongoose";
 
-
 const IncomeSchema = new Schema({
   title: {
     type: String,
@@ -14,9 +13,8 @@ const IncomeSchema = new Schema({
     type: Date,
     required: true,
   },
-  category: {
+  description: {
     type: String,
-    default: undefined,
   },
 });
 
