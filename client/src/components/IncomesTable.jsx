@@ -62,7 +62,7 @@ const IncomesTable = ({ onEdit }) => {
             <TableHead>Title</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead>Date</TableHead>
-            <TableHead>Category</TableHead>
+            <TableHead>description</TableHead>
             <TableHead>Created</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -75,7 +75,7 @@ const IncomesTable = ({ onEdit }) => {
                 {formatAmount(income.amount)}
               </TableCell>
               <TableCell>{formatDate(income.date)}</TableCell>
-              <TableCell>{income.category || '-'}</TableCell>
+              <TableCell>{income.description || '-'}</TableCell>
               <TableCell>{formatDate(income.createdAt)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-2">

@@ -21,7 +21,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
     title: expense?.title || "",
     amount: expense?.amount.toString() || "",
     date: expense?.date || "",
-    category: expense?.category || "",
+    description: expense?.description || "",
   });
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
         title: expense.title,
         amount: expense.amount.toString(),
         date: expense.date,
-        category: expense.category || "",
+        description: expense.description || "",
       });
     }
   }, [expense]);
@@ -42,7 +42,7 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
       title: formData.title,
       amount: parseFloat(formData.amount),
       date: formData.date,
-      category: formData.category || undefined,
+      description: formData.description || undefined,
     };
 
     console.log("Saving expense:", expenseData);
@@ -100,11 +100,11 @@ const ExpenseForm: React.FC<ExpenseFormProps> = ({
           </div>
 
           <div>
-            <Label htmlFor="category">Category (Optional)</Label>
+            <Label htmlFor="description">description (Optional)</Label>
             <Input
-              id="category"
-              name="category"
-              value={formData.category}
+              id="description"
+              name="description"
+              value={formData.description}
               onChange={handleChange}
               placeholder="e.g., Utilities, Supplies"
             />

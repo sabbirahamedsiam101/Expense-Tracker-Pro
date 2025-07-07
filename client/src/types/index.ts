@@ -1,29 +1,29 @@
 
 export interface Income {
-  _id: string;
+  _id?: string;
   title: string;
   amount: number;
   date: string;
-  category?: string;
-  createdAt: string;
+  description?: string;
+  createdAt?: string;
 }
 
 export interface Expense {
-  _id: string;
+  _id?: string;
   title: string;
   amount: number;
   date: string;
-  category?: string;
-  createdAt: string;
+  description?: string;
+  createdAt?: string;
 }
 
 export interface Loan {
-  _id: string;
+  _id?: string;
   employeeName: string;
   amount: number;
   reason: string;
   date: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface DashboardSummary {

@@ -11,7 +11,7 @@ export const expensesApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Expense"],
+  tagTypes: ["Expense", "Summary"],
   endpoints: (builder) => ({
     // Get all Expenses
     getExpenses: builder.query({
@@ -26,7 +26,7 @@ export const expensesApi = createApi({
         method: "POST",
         body: newExpense,
       }),
-      invalidatesTags: ["Expense"], // Invalidate the cache after adding a new expense
+      invalidatesTags: ["Expense", "Summary"], // Invalidate the cache after adding a new expense
     }),
 
     // Update an Expense
@@ -36,7 +36,7 @@ export const expensesApi = createApi({
         method: "PUT",
         body: updatedExpense,
       }),
-      invalidatesTags: ["Expense"],
+      invalidatesTags: ["Expense", "Summary"],
     }),
 
     // Delete an Expense
@@ -45,7 +45,7 @@ export const expensesApi = createApi({
         url: `/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Expense"],
+      invalidatesTags: ["Expense", "Summary"],
     }),
   }),
 });

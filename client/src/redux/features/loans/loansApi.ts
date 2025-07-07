@@ -11,7 +11,7 @@ export const loansApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Loan"],
+  tagTypes: ["Loan", "Summary"],
   endpoints: (builder) => ({
     // Get all Loans
     getLoans: builder.query({
@@ -26,7 +26,7 @@ export const loansApi = createApi({
         method: "POST",
         body: newLoan,
       }),
-      invalidatesTags: ["Loan"],
+      invalidatesTags: ["Loan", "Summary"],
     }),
 
     // Update a Loan
@@ -36,7 +36,7 @@ export const loansApi = createApi({
         method: "PUT",
         body: updatedLoan,
       }),
-      invalidatesTags: ["Loan"],
+      invalidatesTags: ["Loan", "Summary"],
     }),
 
     // Delete a Loan
@@ -45,7 +45,7 @@ export const loansApi = createApi({
         url: `/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Loan"],
+      invalidatesTags: ["Loan", "Summary"],
     }),
   }),
 });

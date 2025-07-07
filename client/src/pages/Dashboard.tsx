@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -30,13 +30,27 @@ import {
 const Dashboard: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const { data: monthlyDataOne, isLoading } = useGetMonthlySummaryOneQuery({
+
+  const {
+    data: monthlyDataOne,
+    isLoading,
+    refetch: refetchMonthlyOne,
+  } = useGetMonthlySummaryOneQuery({
     year: selectedYear,
     month: selectedMonth,
   });
 
-  const { data: annualData } = useGetAnnualSummaryQuery(selectedYear);
-  const { data: monthlyData } = useGetMonthlySummaryAllQuery(selectedYear);
+  const { data: annualData, refetch: refetchAnnual } =
+    useGetAnnualSummaryQuery(selectedYear);
+  const { data: monthlyData, refetch: refetchMonthlyAll } =
+    useGetMonthlySummaryAllQuery(selectedYear);
+
+  // ✅ ADD THIS HERE:
+  useEffect(() => {
+    refetchMonthlyOne();
+    refetchAnnual();
+    refetchMonthlyAll();
+  }, [selectedYear, selectedMonth]);
 
   const months = [
     "January",
@@ -59,22 +73,36 @@ const Dashboard: React.FC = () => {
   );
 
   const pieData = [
-    { name: "Income", value: 50000, color: "#22c55e" },
-    { name: "Expenses", value: 30000, color: "#ef4444" },
-    { name: "Loans", value: 10000, color: "#f59e0b" },
+    {
+      name: "Income",
+      value: annualData?.totalIncome || 0,
+      color: "#22c55e",
+    },
+    {
+      name: "Expenses",
+      value: annualData?.totalExpenses || 0,
+      color: "#ef4444",
+    },
+    {
+      name: "Loans",
+      value: annualData?.totalLoans || 0,
+      color: "#f59e0b",
+    },
   ];
 
-  const monthlyChartData = [
-    { month: "Jan", income: 4000, expenses: 2000, loans: 500, profit: 1500 },
-    { month: "Feb", income: 4500, expenses: 2500, loans: 800, profit: 1200 },
-    { month: "Mar", income: 4800, expenses: 2200, loans: 600, profit: 2000 },
-    { month: "Apr", income: 5200, expenses: 3000, loans: 1000, profit: 1200 },
-  ];
+  const monthlyChartData =
+    monthlyData?.map((item: any) => ({
+      month: months[item.month - 1].slice(0, 3),
+      income: item.totalIncome || 0,
+      expenses: item.totalExpenses || 0,
+      loans: item.totalLoans || 0,
+      profit: item.netProfit || 0,
+    })) || [];
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
-  console.log("get monthly summary one", monthlyDataOne , "get annual summary", annualData, "get monthly summary", monthlyData);
+  console.log(monthlyDataOne);
   return (
     <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -123,26 +151,26 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <SummaryCard
             title="Monthly Income"
-            amount={5000}
+            amount={monthlyDataOne?.totalIncome || 0}
             color="green"
             icon={<TrendingUp size={20} />}
           />
           <SummaryCard
             title="Monthly Expenses"
-            amount={3000}
+            amount={monthlyDataOne?.totalExpenses || 0}
             color="red"
             icon={<TrendingDown size={20} />}
           />
           <SummaryCard
             title="Monthly Loans"
-            amount={1000}
+            amount={monthlyDataOne?.totalLoans || 0}
             color="blue"
             icon={<CreditCard size={20} />}
           />
           <SummaryCard
             title="Monthly Profit"
-            amount={1000}
-            color={"green"}
+            amount={monthlyDataOne?.profit || 0}
+            color={(monthlyDataOne?.profit || 0) >= 0 ? "green" : "red"}
             icon={<DollarSign size={20} />}
           />
         </div>
@@ -155,26 +183,26 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <SummaryCard
             title="Annual Income"
-            amount={50000}
+            amount={annualData?.totalIncome || 0}
             color="green"
             icon={<TrendingUp size={20} />}
           />
           <SummaryCard
             title="Annual Expenses"
-            amount={30000}
+            amount={annualData?.totalExpenses || 0}
             color="red"
             icon={<TrendingDown size={20} />}
           />
           <SummaryCard
             title="Annual Loans"
-            amount={10000}
+            amount={annualData?.totalLoans || 0}
             color="blue"
             icon={<CreditCard size={20} />}
           />
           <SummaryCard
             title="Annual Profit"
-            amount={10000}
-            color={"green"}
+            amount={annualData?.profit || 0}
+            color={(annualData?.profit || 0) >= 0 ? "green" : "red"}
             icon={<DollarSign size={20} />}
           />
         </div>

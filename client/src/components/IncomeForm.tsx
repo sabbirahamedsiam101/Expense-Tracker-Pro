@@ -21,7 +21,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({
     title: income?.title || "",
     amount: income?.amount.toString() || "", // Ensure amount is handled as a string
     date: income?.date || "",
-    category: income?.category || "",
+    description: income?.description || "",
   });
 
   // Update formData when `income` prop changes (for editing mode)
@@ -31,7 +31,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({
         title: income.title,
         amount: income.amount.toString(), // Ensure it's treated as string for input
         date: income.date,
-        category: income.category || "",
+        description: income.description || "",
       });
     }
   }, [income]);
@@ -49,7 +49,7 @@ const IncomeForm: React.FC<IncomeFormProps> = ({
       title: formData.title,
       amount: parseFloat(formData.amount), // Ensure the amount is stored as a number
       date: formData.date,
-      category: formData.category || undefined, // Category is optional
+      description: formData.description || undefined, // description is optional
     };
 
     // Log incomeData for debugging
@@ -109,11 +109,11 @@ const IncomeForm: React.FC<IncomeFormProps> = ({
           </div>
 
           <div>
-            <Label htmlFor="category">Category (Optional)</Label>
+            <Label htmlFor="description">description (Optional)</Label>
             <Input
-              id="category"
-              name="category"
-              value={formData.category}
+              id="description"
+              name="description"
+              value={formData.description}
               onChange={handleChange}
               placeholder="e.g., Work, Business"
             />

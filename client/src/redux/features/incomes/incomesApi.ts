@@ -10,7 +10,7 @@ export const incomesApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Income"],
+  tagTypes: ["Income", "Summary"],
   endpoints: (builder) => ({
     getIncomes: builder.query({
       query: () => "/",
@@ -22,7 +22,7 @@ export const incomesApi = createApi({
         method: "POST",
         body: newIncome,
       }),
-      invalidatesTags: ["Income"],
+      invalidatesTags: ["Income", "Summary"],
     }),
     updateIncome: builder.mutation({
       query: ({ id, ...updatedIncome }) => ({
@@ -30,14 +30,14 @@ export const incomesApi = createApi({
         method: "PUT",
         body: updatedIncome,
       }),
-      invalidatesTags: ["Income"],
+      invalidatesTags: ["Income", "Summary"],
     }),
     deleteIncome: builder.mutation({
       query: (id) => ({
         url: `/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Income"],
+      invalidatesTags: ["Income", "Summary"],
     }),
   }),
 });

@@ -137,7 +137,7 @@ const Incomes: React.FC = () => {
                     </div>
                     <div className="text-xs sm:text-sm text-gray-600 space-y-1">
                       <p>Date: {formatDate(income.date)}</p>
-                      {income.category && <p>Category: {income.category}</p>}
+                      {income.description && <p>description: {income.description}</p>}
                       <p>Added: {formatDate(income.createdAt)}</p>
                     </div>
                   </div>
