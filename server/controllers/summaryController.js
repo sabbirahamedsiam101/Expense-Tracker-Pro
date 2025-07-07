@@ -15,15 +15,27 @@ export const getMonthlyData = async (req, res) => {
     const [incomeMonthly, expenseMonthly, loanMonthly] = await Promise.all([
       Income.aggregate([
         { $match: { date: { $gte: start, $lt: end } } },
-        { $group: { _id: { $month: "$date" }, totalIncome: { $sum: "$amount" } } },
+        {
+          $group: {
+            _id: { $month: "$date" },
+            totalIncome: { $sum: "$amount" },
+          },
+        },
       ]),
       Expense.aggregate([
         { $match: { date: { $gte: start, $lt: end } } },
-        { $group: { _id: { $month: "$date" }, totalExpenses: { $sum: "$amount" } } },
+        {
+          $group: {
+            _id: { $month: "$date" },
+            totalExpenses: { $sum: "$amount" },
+          },
+        },
       ]),
       Loan.aggregate([
         { $match: { date: { $gte: start, $lt: end } } },
-        { $group: { _id: { $month: "$date" }, totalLoans: { $sum: "$amount" } } },
+        {
+          $group: { _id: { $month: "$date" }, totalLoans: { $sum: "$amount" } },
+        },
       ]),
     ]);
 
@@ -65,11 +77,13 @@ export const getMonthlyData = async (req, res) => {
 // GET /summary/monthly-one?year=2025&month=7
 export const getMonthlySummary = async (req, res) => {
   const { year, month } = req.query;
-
+  const parsedYear = parseInt(year);
+  const parsedMonth = parseInt(month);
   try {
-    const start = new Date(year, month - 1, 1);
-    const end = new Date(year, month, 1);
-
+    // const start = new Date(year, month - 1, 1);
+    // const end = new Date(year, month, 1);
+    const start = new Date(parsedYear, parsedMonth, 1);
+    const end = new Date(parsedYear, parsedMonth + 1, 1);
     const [income, expense, loan] = await Promise.all([
       Income.aggregate([
         { $match: { date: { $gte: start, $lt: end } } },
@@ -90,6 +104,14 @@ export const getMonthlySummary = async (req, res) => {
     const totalLoans = loan[0]?.totalLoans || 0;
 
     const profit = totalIncome - (totalExpenses + totalLoans);
+    console.log(
+      "totalIncome:",
+      totalIncome,
+      "totalExpenses:",
+      totalExpenses,
+      "totalLoans:",
+      totalLoans
+    );
 
     res.json({ totalIncome, totalExpenses, totalLoans, profit });
   } catch (error) {

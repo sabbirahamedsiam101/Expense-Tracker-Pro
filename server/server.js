@@ -5,6 +5,7 @@ import connectDB from "./config/db.js";
 import incomeRouter from "./routes/income.routes.js";
 import expenseRouter from "./routes/expense.routes.js";
 import loanRouter from "./routes/loan.routes.js";
+import summaryRouter from "./routes/summary.routes.js";
 
 dotenv.config();
 connectDB();
@@ -22,6 +23,7 @@ app.get("/", (req, res) => res.send("Server is running"));
 app.use("/api/incomes", incomeRouter);
 app.use("/api/expenses", expenseRouter);
 app.use("/api/loans", loanRouter);
+app.use("/api/summary", summaryRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>

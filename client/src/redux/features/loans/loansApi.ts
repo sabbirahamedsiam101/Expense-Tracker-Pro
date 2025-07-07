@@ -47,21 +47,6 @@ export const loansApi = createApi({
       }),
       invalidatesTags: ["Loan"],
     }),
-
-    // Monthly Loan Summary
-    getMonthlyLoanSummary: builder.query({
-      query: ({ year, month }) => `/monthly?year=${year}&month=${month}`, // Update the endpoint for monthly loan summary
-    }),
-
-    // Annual Loan Summary
-    getAnnualLoanSummary: builder.query({
-      query: (year) => `/annual?year=${year}`, // Update the endpoint for annual loan summary
-    }),
-
-    // Monthly Loan Data (Trends for Loans - Income, Expenses, Loans, Profit)
-    getMonthlyLoanData: builder.query({
-      query: (year) => `/monthly-data?year=${year}`, // Add this endpoint for loan trends data
-    }),
   }),
 });
 
@@ -70,9 +55,6 @@ export const {
   useAddLoanMutation,
   useUpdateLoanMutation,
   useDeleteLoanMutation,
-  useGetMonthlyLoanSummaryQuery,
-  useGetAnnualLoanSummaryQuery,
-  useGetMonthlyLoanDataQuery,  // This hook is now available
 } = loansApi;
 
 export default loansApi;

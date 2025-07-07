@@ -21,77 +21,22 @@ import {
   Cell,
 } from "recharts";
 import { TrendingUp, TrendingDown, DollarSign, CreditCard } from "lucide-react";
-
-// Import hooks for Income, Expense, and Loan APIs
 import {
-  useGetMonthlyIncomeSummaryQuery,
-  useGetAnnualIncomeSummaryQuery,
-  useGetMonthlyIncomeDataQuery,
-} from "@/redux/features/incomes/incomesApi";
-
-import {
-  useGetMonthlyExpenseSummaryQuery,
-  useGetAnnualExpenseSummaryQuery,
-  useGetMonthlyExpenseDataQuery,
-} from "@/redux/features/expenses/expensesApi";
-
-import {
-  useGetMonthlyLoanSummaryQuery,
-  useGetAnnualLoanSummaryQuery,
-  useGetMonthlyLoanDataQuery,
-} from "@/redux/features/loans/loansApi";
+  useGetAnnualSummaryQuery,
+  useGetMonthlySummaryAllQuery,
+  useGetMonthlySummaryOneQuery,
+} from "@/redux/features/summary/summaryApi";
 
 const Dashboard: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const { data: monthlyDataOne, isLoading } = useGetMonthlySummaryOneQuery({
+    year: selectedYear,
+    month: selectedMonth,
+  });
 
-  // Fetch monthly summary data for income, expense, and loan
-  const { data: monthlyIncomeSummary, isLoading: isMonthlyIncomeLoading } =
-    useGetMonthlyIncomeSummaryQuery({
-      year: selectedYear,
-      month: selectedMonth,
-    });
-  const { data: monthlyExpenseSummary, isLoading: isMonthlyExpenseLoading } =
-    useGetMonthlyExpenseSummaryQuery({
-      year: selectedYear,
-      month: selectedMonth,
-    });
-  const { data: monthlyLoanSummary, isLoading: isMonthlyLoanLoading } =
-    useGetMonthlyLoanSummaryQuery({
-      year: selectedYear,
-      month: selectedMonth,
-    });
-
-  // Fetch annual summary data for income, expense, and loan
-  const { data: annualIncomeSummary, isLoading: isAnnualIncomeLoading } =
-    useGetAnnualIncomeSummaryQuery(selectedYear);
-  const { data: annualExpenseSummary, isLoading: isAnnualExpenseLoading } =
-    useGetAnnualExpenseSummaryQuery(selectedYear);
-  const { data: annualLoanSummary, isLoading: isAnnualLoanLoading } =
-    useGetAnnualLoanSummaryQuery(selectedYear);
-
-  // Fetch monthly data for income, expense, and loan trends
-  const { data: monthlyIncomeData, isLoading: isMonthlyIncomeDataLoading } =
-    useGetMonthlyIncomeDataQuery(selectedYear);
-  const { data: monthlyExpenseData, isLoading: isMonthlyExpenseDataLoading } =
-    useGetMonthlyExpenseDataQuery(selectedYear);
-  const { data: monthlyLoanData, isLoading: isMonthlyLoanDataLoading } =
-    useGetMonthlyLoanDataQuery(selectedYear);
-
-  // Loading state
-  if (
-    isMonthlyIncomeLoading ||
-    isAnnualIncomeLoading ||
-    isMonthlyIncomeDataLoading ||
-    isMonthlyExpenseLoading ||
-    isAnnualExpenseLoading ||
-    isMonthlyExpenseDataLoading ||
-    isMonthlyLoanLoading ||
-    isAnnualLoanLoading ||
-    isMonthlyLoanDataLoading
-  ) {
-    return <div>Loading...</div>; // Show loading while data is being fetched
-  }
+  const { data: annualData } = useGetAnnualSummaryQuery(selectedYear);
+  const { data: monthlyData } = useGetMonthlySummaryAllQuery(selectedYear);
 
   const months = [
     "January",
@@ -113,27 +58,23 @@ const Dashboard: React.FC = () => {
     (_, i) => new Date().getFullYear() - 2 + i
   );
 
-  // Pie chart data for Income, Expense, and Loan
   const pieData = [
-    {
-      name: "Income",
-      value: annualIncomeSummary?.totalIncome || 0,
-      color: "#22c55e",
-    },
-    {
-      name: "Expenses",
-      value: annualExpenseSummary?.totalExpenses || 0,
-      color: "#ef4444",
-    },
-    {
-      name: "Loans",
-      value: annualLoanSummary?.totalLoans || 0,
-      color: "#f59e0b",
-    },
+    { name: "Income", value: 50000, color: "#22c55e" },
+    { name: "Expenses", value: 30000, color: "#ef4444" },
+    { name: "Loans", value: 10000, color: "#f59e0b" },
   ];
 
-  console.log("Annual expence:", annualExpenseSummary);
+  const monthlyChartData = [
+    { month: "Jan", income: 4000, expenses: 2000, loans: 500, profit: 1500 },
+    { month: "Feb", income: 4500, expenses: 2500, loans: 800, profit: 1200 },
+    { month: "Mar", income: 4800, expenses: 2200, loans: 600, profit: 2000 },
+    { month: "Apr", income: 5200, expenses: 3000, loans: 1000, profit: 1200 },
+  ];
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  console.log("get monthly summary one", monthlyDataOne , "get annual summary", annualData, "get monthly summary", monthlyData);
   return (
     <div className="space-y-6 sm:space-y-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -175,7 +116,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Monthly Summary */}
       <div>
         <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">
           Monthly Summary - {months[selectedMonth]} {selectedYear}
@@ -183,32 +123,31 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <SummaryCard
             title="Monthly Income"
-            amount={monthlyIncomeSummary?.totalIncome}
+            amount={5000}
             color="green"
             icon={<TrendingUp size={20} />}
           />
           <SummaryCard
             title="Monthly Expenses"
-            amount={monthlyExpenseSummary?.totalExpenses}
+            amount={3000}
             color="red"
             icon={<TrendingDown size={20} />}
           />
           <SummaryCard
             title="Monthly Loans"
-            amount={monthlyLoanSummary?.totalLoans}
+            amount={1000}
             color="blue"
             icon={<CreditCard size={20} />}
           />
           <SummaryCard
             title="Monthly Profit"
-            amount={monthlyIncomeSummary?.profit}
-            color={monthlyIncomeSummary?.profit >= 0 ? "green" : "red"}
+            amount={1000}
+            color={"green"}
             icon={<DollarSign size={20} />}
           />
         </div>
       </div>
 
-      {/* Annual Summary */}
       <div>
         <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4">
           Annual Summary - {selectedYear}
@@ -216,32 +155,31 @@ const Dashboard: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <SummaryCard
             title="Annual Income"
-            amount={annualIncomeSummary?.totalIncome}
+            amount={50000}
             color="green"
             icon={<TrendingUp size={20} />}
           />
           <SummaryCard
             title="Annual Expenses"
-            amount={annualExpenseSummary?.totalExpenses}
+            amount={30000}
             color="red"
             icon={<TrendingDown size={20} />}
           />
           <SummaryCard
             title="Annual Loans"
-            amount={annualLoanSummary?.totalLoans}
+            amount={10000}
             color="blue"
             icon={<CreditCard size={20} />}
           />
           <SummaryCard
             title="Annual Profit"
-            amount={annualIncomeSummary?.profit}
-            color={annualIncomeSummary?.profit >= 0 ? "green" : "red"}
+            amount={10000}
+            color={"green"}
             icon={<DollarSign size={20} />}
           />
         </div>
       </div>
 
-      {/* Charts */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
         <Card>
           <CardHeader>
@@ -256,7 +194,7 @@ const Dashboard: React.FC = () => {
               className="sm:h-[300px]"
             >
               <BarChart
-                data={monthlyIncomeData}
+                data={monthlyChartData}
                 margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" />

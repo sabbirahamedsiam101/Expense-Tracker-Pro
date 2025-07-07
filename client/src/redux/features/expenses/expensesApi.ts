@@ -47,21 +47,6 @@ export const expensesApi = createApi({
       }),
       invalidatesTags: ["Expense"],
     }),
-
-    // Get Monthly Expense Summary
-    getMonthlyExpenseSummary: builder.query({
-      query: ({ year, month }) => `/monthly?year=${year}&month=${month}`, // Update the endpoint as needed
-    }),
-
-    // Get Annual Expense Summary
-    getAnnualExpenseSummary: builder.query({
-      query: (year) => `/annual?year=${year}`, // Update the endpoint as needed
-    }),
-
-    // Monthly Data for the trends (used in charts)
-    getMonthlyExpenseData: builder.query({
-      query: (year) => `/monthly-data?year=${year}`, // Update the endpoint as needed
-    }),
   }),
 });
 
@@ -70,9 +55,6 @@ export const {
   useAddExpenseMutation,
   useUpdateExpenseMutation,
   useDeleteExpenseMutation,
-  useGetMonthlyExpenseSummaryQuery,
-  useGetAnnualExpenseSummaryQuery,
-  useGetMonthlyExpenseDataQuery,
 } = expensesApi;
 
 export default expensesApi;
