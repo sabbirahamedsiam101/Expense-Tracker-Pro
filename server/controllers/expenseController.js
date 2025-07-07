@@ -25,7 +25,11 @@ export const createExpense = async (req, res) => {
 // Update an Expense by ID
 export const updateExpense = async (req, res) => {
   try {
-    const updatedExpense = await Expense.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedExpense = await Expense.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
     if (!updatedExpense) {
       return res.status(404).json({ message: "Expense not found" });
     }
@@ -65,9 +69,15 @@ export const getMonthlyData = async (req, res) => {
         $group: {
           _id: { $month: "$date" }, // Group by month
           expenses: { $sum: "$amount" },
-          income: { $sum: { $cond: [{ $eq: ["$category", "income"] }, "$amount", 0] } },
-          loans: { $sum: { $cond: [{ $eq: ["$category", "loan"] }, "$amount", 0] } },
-          profit: { $sum: { $cond: [{ $eq: ["$category", "income"] }, "$amount", 0] } },
+          income: {
+            $sum: { $cond: [{ $eq: ["$category", "income"] }, "$amount", 0] },
+          },
+          loans: {
+            $sum: { $cond: [{ $eq: ["$category", "loan"] }, "$amount", 0] },
+          },
+          profit: {
+            $sum: { $cond: [{ $eq: ["$category", "income"] }, "$amount", 0] },
+          },
         },
       },
       { $sort: { _id: 1 } }, // Sort by month
@@ -109,7 +119,9 @@ export const getMonthlySummary = async (req, res) => {
       },
     ]);
 
-    const profit = expenses[0]?.totalIncome - (expenses[0]?.totalExpenses + expenses[0]?.totalLoans);
+    const profit =
+      expenses[0]?.totalIncome -
+      (expenses[0]?.totalExpenses + expenses[0]?.totalLoans);
 
     res.json({
       totalIncome: expenses[0]?.totalIncome || 0,
@@ -136,20 +148,40 @@ export const getAnnualSummary = async (req, res) => {
         },
       },
       {
+        $project: {
+          category: 1, // Project category to check it
+          amount: 1,   // Keep amount for calculation
+          date: 1,
+        }
+      },
+      {
+        $match: {
+          category: { $exists: true, $ne: null }, // Ensure category exists and is not null
+        },
+      },
+      {
         $group: {
           _id: null,
           totalIncome: { $sum: "$amount" },
           totalExpenses: {
-            $sum: { $cond: [{ $eq: ["$category", "expense"] }, "$amount", 0] },
+            $sum: {
+              $cond: [
+                { $eq: [{ $toLower: { $trim: { input: "$category" } } }, "expense"] },
+                "$amount",
+                0,
+              ],
+            },
           },
           totalLoans: {
-            $sum: { $cond: [{ $eq: ["$category", "loan"] }, "$amount", 0] },
+            $sum: { $cond: [{ $eq: [{ $toLower: { $trim: { input: "$category" } } }, "loan"] }, "$amount", 0] },
           },
         },
       },
     ]);
 
-    const profit = expenses[0]?.totalIncome - (expenses[0]?.totalExpenses + expenses[0]?.totalLoans);
+    console.log("Aggregated Expenses:", expenses); // Log the aggregation result
+    const profit =
+      expenses[0]?.totalIncome - (expenses[0]?.totalExpenses + expenses[0]?.totalLoans);
 
     res.json({
       totalIncome: expenses[0]?.totalIncome || 0,
@@ -161,3 +193,4 @@ export const getAnnualSummary = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+

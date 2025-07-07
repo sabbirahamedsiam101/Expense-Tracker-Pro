@@ -1,66 +1,66 @@
 // src/features/expenses/expensesApi.js
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { getBaseURL } from "../../../utlis/baseURL"; // Assuming you have a baseURL utility
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { getBaseURL } from "../../../utlis/baseURL";
 
 export const expensesApi = createApi({
-  reducerPath: 'expensesApi',
+  reducerPath: "expensesApi",
   baseQuery: fetchBaseQuery({
     baseUrl: `${getBaseURL()}/api/expenses`, // URL for expenses
     prepareHeaders: (headers) => {
-      headers.set('content-type', 'application/json');
+      headers.set("content-type", "application/json");
       return headers;
     },
   }),
-  tagTypes: ['Expense'],
+  tagTypes: ["Expense"],
   endpoints: (builder) => ({
     // Get all Expenses
     getExpenses: builder.query({
-      query: () => '/',
-      providesTags: ['Expense'],
+      query: () => "/",
+      providesTags: ["Expense"],
     }),
 
     // Add an Expense
     addExpense: builder.mutation({
       query: (newExpense) => ({
-        url: '/',
-        method: 'POST',
+        url: "/",
+        method: "POST",
         body: newExpense,
       }),
-      invalidatesTags: ['Expense'], // Invalidate the cache after adding a new expense
+      invalidatesTags: ["Expense"], // Invalidate the cache after adding a new expense
     }),
 
     // Update an Expense
     updateExpense: builder.mutation({
       query: ({ id, ...updatedExpense }) => ({
         url: `/${id}`,
-        method: 'PUT',
+        method: "PUT",
         body: updatedExpense,
       }),
-      invalidatesTags: ['Expense'],
+      invalidatesTags: ["Expense"],
     }),
 
     // Delete an Expense
     deleteExpense: builder.mutation({
       query: (id) => ({
         url: `/${id}`,
-        method: 'DELETE',
+        method: "DELETE",
       }),
-      invalidatesTags: ['Expense'],
+      invalidatesTags: ["Expense"],
     }),
 
-    // Get Monthly Summary
-    getMonthlySummary: builder.query({
-      query: ({ year, month }) => `/monthly?year=${year}&month=${month}`,
+    // Get Monthly Expense Summary
+    getMonthlyExpenseSummary: builder.query({
+      query: ({ year, month }) => `/monthly?year=${year}&month=${month}`, // Update the endpoint as needed
     }),
 
-    // Get Annual Summary
-    getAnnualSummary: builder.query({
-      query: (year) => `/annual?year=${year}`,
+    // Get Annual Expense Summary
+    getAnnualExpenseSummary: builder.query({
+      query: (year) => `/annual?year=${year}`, // Update the endpoint as needed
     }),
 
     // Monthly Data for the trends (used in charts)
-    getMonthlyData: builder.query({
-      query: (year) => `/monthly-data?year=${year}`,
+    getMonthlyExpenseData: builder.query({
+      query: (year) => `/monthly-data?year=${year}`, // Update the endpoint as needed
     }),
   }),
 });
@@ -70,9 +70,9 @@ export const {
   useAddExpenseMutation,
   useUpdateExpenseMutation,
   useDeleteExpenseMutation,
-  useGetMonthlySummaryQuery,
-  useGetAnnualSummaryQuery,
-  useGetMonthlyDataQuery,
+  useGetMonthlyExpenseSummaryQuery,
+  useGetAnnualExpenseSummaryQuery,
+  useGetMonthlyExpenseDataQuery,
 } = expensesApi;
 
 export default expensesApi;

@@ -1,4 +1,4 @@
-import Loan from "../models/loan.schema.js";
+import Loan from "../models/loan.schema.js"; // Loan model
 
 // Get all Loans
 export const getLoans = async (req, res) => {
@@ -25,9 +25,7 @@ export const createLoan = async (req, res) => {
 // Update a Loan by ID
 export const updateLoan = async (req, res) => {
   try {
-    const updatedLoan = await Loan.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const updatedLoan = await Loan.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!updatedLoan) {
       return res.status(404).json({ message: "Loan not found" });
     }
@@ -47,5 +45,66 @@ export const deleteLoan = async (req, res) => {
     res.json({ message: "Loan deleted successfully" });
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+// Get Monthly Loan Summary
+export const getMonthlyLoanSummary = async (req, res) => {
+  const { year, month } = req.query;
+  try {
+    const startOfMonth = new Date(year, month, 1);
+    const endOfMonth = new Date(year, parseInt(month) + 1, 0); // Last day of the selected month
+
+    const loans = await Loan.aggregate([
+      {
+        $match: {
+          date: {
+            $gte: startOfMonth,
+            $lt: endOfMonth,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalLoans: { $sum: "$amount" },
+        },
+      },
+    ]);
+
+    res.json({
+      totalLoans: loans[0]?.totalLoans || 0,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get Annual Loan Summary
+export const getAnnualLoanSummary = async (req, res) => {
+  const { year } = req.query;
+  try {
+    const loans = await Loan.aggregate([
+      {
+        $match: {
+          date: {
+            $gte: new Date(year, 0, 1), // Start of the year
+            $lt: new Date(year + 1, 0, 1), // End of the year
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalLoans: { $sum: "$amount" },
+        },
+      },
+    ]);
+
+    res.json({
+      totalLoans: loans[0]?.totalLoans || 0,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

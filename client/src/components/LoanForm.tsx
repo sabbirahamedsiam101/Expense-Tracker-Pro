@@ -1,24 +1,24 @@
-
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { loanService } from '@/services/dataService';
-import { Loan } from '@/types';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { loanService } from "@/services/dataService";
+import { Loan } from "@/types";
 
 interface LoanFormProps {
   loan?: Loan;
-  onSave: () => void;
+  onSave: (loanData: Loan) => void;
   onCancel: () => void;
 }
 
 const LoanForm: React.FC<LoanFormProps> = ({ loan, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
-    employeeName: '',
-    amount: '',
-    reason: '',
-    date: ''
+    employeeName: "",
+    amount: "",
+    reason: "",
+    date: "",
+    
   });
 
   useEffect(() => {
@@ -27,28 +27,23 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSave, onCancel }) => {
         employeeName: loan.employeeName,
         amount: loan.amount.toString(),
         reason: loan.reason,
-        date: loan.date
+        date: loan.date,
+ 
       });
     }
   }, [loan]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const loanData = {
       employeeName: formData.employeeName,
       amount: parseFloat(formData.amount),
       reason: formData.reason,
-      date: formData.date
+      date: formData.date,
     };
 
-    if (loan) {
-      loanService.update(loan.id, loanData);
-    } else {
-      loanService.create(loanData);
-    }
-    
-    onSave();
+    onSave(loanData);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +53,7 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSave, onCancel }) => {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>{loan ? 'Edit Loan' : 'Add New Loan'}</CardTitle>
+        <CardTitle>{loan ? "Edit Loan" : "Add New Loan"}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -73,7 +68,7 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSave, onCancel }) => {
               required
             />
           </div>
-          
+
           <div>
             <Label htmlFor="amount">Amount</Label>
             <Input
@@ -87,7 +82,7 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSave, onCancel }) => {
               required
             />
           </div>
-          
+
           <div>
             <Label htmlFor="reason">Reason</Label>
             <Input
@@ -99,7 +94,7 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSave, onCancel }) => {
               required
             />
           </div>
-          
+
           <div>
             <Label htmlFor="date">Date</Label>
             <Input
@@ -111,12 +106,17 @@ const LoanForm: React.FC<LoanFormProps> = ({ loan, onSave, onCancel }) => {
               required
             />
           </div>
-          
+
           <div className="flex space-x-2 pt-4">
             <Button type="submit" className="flex-1">
-              {loan ? 'Update' : 'Add'} Loan
+              {loan ? "Update" : "Add"} Loan
             </Button>
-            <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              className="flex-1"
+            >
               Cancel
             </Button>
           </div>

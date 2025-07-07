@@ -41,17 +41,17 @@ export const incomesApi = createApi({
     }),
 
     // Annual summary endpoint
-    getAnnualSummary: builder.query({
+    getAnnualIncomeSummary: builder.query({
       query: (year) => `/annual?year=${year}`, // Endpoint for annual summary
     }),
 
     // Monthly summary endpoint
-    getMonthlySummary: builder.query({
+    getMonthlyIncomeSummary: builder.query({
       query: ({ year, month }) => `/monthly?year=${year}&month=${month}`, // Endpoint for monthly summary
     }),
 
     // Monthly data for BarChart (income, expenses, loans, profit)
-    getMonthlyData: builder.query({
+    getMonthlyIncomeData: builder.query({
       query: (year) => `/monthly-data?year=${year}`, // New endpoint for monthly data
     }),
   }),
@@ -62,9 +62,9 @@ export const {
   useAddIncomeMutation,
   useUpdateIncomeMutation,
   useDeleteIncomeMutation,
-  useGetAnnualSummaryQuery,
-  useGetMonthlySummaryQuery,
-  useGetMonthlyDataQuery,  // Add the hook for monthly data
+  useGetAnnualIncomeSummaryQuery,
+  useGetMonthlyIncomeSummaryQuery,
+  useGetMonthlyIncomeDataQuery,  // Add the hook for monthly data
 } = incomesApi;
 
 export default incomesApi;
